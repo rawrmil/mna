@@ -51,6 +51,7 @@ def ProcessElementProperties(element):
 
 def ParseCircuit(text: str):
     # TODO: Unique name check
+    # TODO: Eq parse check
     prop_list = [e.strip().split(None, 3) for e in text.split(';')]
     for i, e in enumerate(prop_list):
         ProcessElementProperties(e)
@@ -68,22 +69,24 @@ def Solve(circuit):
     unknown_currents = []
     eq_list = [0]*len(unique_nodes)
     for e in circuit:
-        print(eq_list)
         etype = e[2][0].lower()
         node1 = unique_nodes.index(e[0])
         node2 = unique_nodes.index(e[1])
         if etype == "r":
-            eq_list[node1] -= potentials[node1]/e[3]
-            eq_list[node2] += potentials[node2]/e[3]
+            eq_list[node1] += (potentials[node1]-potentials[node2])/e[3]
+            eq_list[node2] += (potentials[node2]-potentials[node1])/e[3]
         if etype == "i":
             eq_list[node1] -= e[3]
             eq_list[node2] += e[3]
         if etype == "u":
             unknown_currents.append(sp.Symbol(f"i_{e[2][1]}"))
-            eq_list[node1] -= unknown_currents[-1]
-            eq_list[node2] += unknown_currents[-1]
-            eq_list.append(potentials[node1]-potentials[node2])
+            eq_list[node1] += unknown_currents[-1]
+            eq_list[node2] -= unknown_currents[-1]
+            eq_list.append(potentials[node1]-potentials[node2]+e[3])
+    eq_list.append(potentials[-1])
     print(eq_list)
+    sol = sp.solve(eq_list, potentials+unknown_currents)
+    print(sol)
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
