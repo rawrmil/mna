@@ -60,13 +60,13 @@ def AddElementToEquations(elem, equations, unknowns):
         equations[nodes[0]] += ((pot1-pot2)/parameters["resistance"])
         equations[nodes[1]] -= ((pot1-pot2)/parameters["resistance"])
     elif etype == "current_source":
-        equations[nodes[0]] -= parameters["current"]
-        equations[nodes[1]] += parameters["current"]
+        equations[nodes[0]] += parameters["current"]
+        equations[nodes[1]] -= parameters["current"]
     elif etype == "voltage_source":
         pot1, pot2 = unknowns[nodes[0]], unknowns[nodes[1]]
         equations[nodes[0]] += unknowns[elem["name"]]
         equations[nodes[1]] -= unknowns[elem["name"]]
-        equations[elem["name"]] += pot1-pot2+parameters["voltage"]
+        equations[elem["name"]] += pot2-pot1-parameters["voltage"]
 
 def Solve(circuit_data):
     circuit = circuit_data["circuit"]
