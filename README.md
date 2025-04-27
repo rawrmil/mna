@@ -8,6 +8,6 @@ My Theoretical Basics of Electrotechnics fun little solvers
 # EXAMPLES: mna/example
 pip install pipenv
 cd mna
-pipenv run mna.py examples/linear1.yaml
+pipenv run ./mna.py examples/linear1.yaml
 # OUTPUT: solved.yaml
 ```
