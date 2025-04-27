@@ -17,9 +17,11 @@ def ParseVariable(var, local_vars):
     local_vars[name] = sp.Symbol(name, real=_real, complex=_complex)
 
 def ParseElement(elem, local_vars):
-    parameters = elem["parameters"]
     # TODO: Check if all variables are in local_vars
     # TODO: Check if value is a string or a number
+    # TODO: Check if nodes is str/integer
+    elem["nodes"] = [str(node) for node in elem["nodes"]]
+    parameters = elem["parameters"]
     for param in parameters.items():
         key, value = param
         value = str(value)
@@ -48,8 +50,17 @@ def Parse(fname):
         ParseElement(elem, local_vars)
     return circuit_data
 
-def Solve(circuit):
-    pass
+def Solve(circuit_data):
+    circuit = circuit_data["circuit"]
+    elements = circuit["elements"]
+    # Creating node list
+    unique_nodes = set()
+    for elem in elements:
+        nodes = elem["nodes"]
+        for node in nodes:
+            unique_nodes.add(node)
+    unique_nodes = sorted(unique_nodes)
+    print(unique_nodes)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -57,3 +68,4 @@ if __name__ == "__main__":
         print("pipenv ./mna.py [file]")
         exit(1)
     circuit_data = Parse(sys.argv[1])
+    Solve(circuit_data)
