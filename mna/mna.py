@@ -10,9 +10,11 @@ from sympy.parsing.mathematica import parse_mathematica
 def ParseVariable(var, local_vars):
     # TODO: Check if name is right
     # TODO: Check if name is unique
+    # TODO: Check if type is right
     name = var["name"]
-    value = sp.Symbol(name)
-    local_vars[name] = value
+    _real = True if var["type"] == "real" else None
+    _complex = True if var["type"] == "complex" else None
+    local_vars[name] = sp.Symbol(name, real=_real, complex=_complex)
 
 def ParseElement(elem, local_vars):
     parameters = elem["parameters"]
