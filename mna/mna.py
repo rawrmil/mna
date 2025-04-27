@@ -7,6 +7,8 @@ import yaml
 import sympy as sp
 from sympy.parsing.mathematica import parse_mathematica
 
+# P A R S I N G
+
 def ParseVariable(var, local_vars):
     # TODO: Check if name is right
     # TODO: Check if name is unique
@@ -28,7 +30,6 @@ def ParseElement(elem, local_vars):
         parameters[key] = parse_mathematica(value)
         replacement_dict = { sp.Symbol(k): v for k, v in local_vars.items() }
         parameters[key] = parameters[key].subs(replacement_dict)
-    print(f"elem: {elem}")
 
 
 def Parse(fname):
@@ -42,30 +43,54 @@ def Parse(fname):
     local_vars = {}
     for var in variables:
         ParseVariable(var, local_vars)
-    print(variables)
-    print(local_vars)
     # Parse elements
     elements = circuit["elements"]
     for elem in elements:
         ParseElement(elem, local_vars)
     return circuit_data
 
+# S O L V I N G
+
+#def AddElementToEquations(elem, equations, unknown_variables):
+#    etype = elem["type"]
+#    nodes = elem["nodes"]
+#    if etype == "resistor":
+#        pos, neg = unknown_variables[nodes[0]], unknown_variables[nodes[1]]
+#        equations[nodes[0]] = ((pos-neg)/elem["resistance"])
+#        equations[nodes[1]] = ((neg-pos)/elem["resistance"])
+#    elif etype == "current_source":
+#        equations[nodes[0]] = -elem["current"]
+#        equations[nodes[1]] = +elem["current"]
+#    elif etype == "voltage_source":
+#        current_name = f"i_{elem['name']}"
+#        unknown_variables[current_name] = sp.Symbol(current_name, complex=True)
+#        equations[nodes[0]] = +unknown_variables[-1]
+#        equations[nodes[1]] = -unknown_variables[-1]
+
 def Solve(circuit_data):
     circuit = circuit_data["circuit"]
     elements = circuit["elements"]
     # Creating node list
-    unique_nodes = set()
+    unknown_variables = dict()
     for elem in elements:
-        nodes = elem["nodes"]
-        for node in nodes:
-            unique_nodes.add(node)
-    unique_nodes = sorted(unique_nodes)
-    print(unique_nodes)
+        if elem["type"] == "voltage_source":
+            name = elem["name"]
+            unknown_variables[name] = sp.Symbol(f"i_{name}", complex=True)
+        for name in elem["nodes"]:
+            unknown_variables[name] = sp.Symbol(f"p_{name}", complex=True)
+    print(unknown_variables)
+    # Equation System
+    #equations = dict((v, 0) for v in unknown_variables)
+    #for elem in elements:
+    #    AddElementToEquations(elem, equations, unknown_variables)
+    #print(*equations, end="\n")
+
+# M A I N
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        # TODO: Erro handling
-        print("pipenv ./mna.py [file]")
+        # TODO: Error handling
+        print("pipenv run ./mna.py [file]")
         exit(1)
     circuit_data = Parse(sys.argv[1])
     Solve(circuit_data)
