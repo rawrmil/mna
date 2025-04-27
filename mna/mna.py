@@ -51,39 +51,48 @@ def Parse(fname):
 
 # S O L V I N G
 
-def AddElementToEquations(elem, equations, unknown_variables):
+def AddElementToEquations(elem, equations, unknowns):
     etype = elem["type"]
     nodes = elem["nodes"]
     parameters = elem["parameters"]
     if etype == "resistor":
-        pot1, pot2 = unknown_variables[nodes[0]], unknown_variables[nodes[1]]
+        pot1, pot2 = unknowns[nodes[0]], unknowns[nodes[1]]
         equations[nodes[0]] += ((pot1-pot2)/parameters["resistance"])
         equations[nodes[1]] -= ((pot2-pot1)/parameters["resistance"])
     elif etype == "current_source":
         equations[nodes[0]] -= parameters["current"]
         equations[nodes[1]] += parameters["current"]
     elif etype == "voltage_source":
-        pot1, pot2 = unknown_variables[nodes[0]], unknown_variables[nodes[1]]
-        equations[nodes[0]] += unknown_variables[elem["name"]]
-        equations[nodes[1]] -= unknown_variables[elem["name"]]
+        pot1, pot2 = unknowns[nodes[0]], unknowns[nodes[1]]
+        equations[nodes[0]] += unknowns[elem["name"]]
+        equations[nodes[1]] -= unknowns[elem["name"]]
         equations[elem["name"]] += pot1-pot2+parameters["voltage"]
 
 def Solve(circuit_data):
     circuit = circuit_data["circuit"]
     elements = circuit["elements"]
     # Creating node list
-    unknown_variables = dict()
+    unknowns = dict()
+    gnd_potential = None
     for elem in elements:
         if elem["type"] == "voltage_source":
             name = elem["name"]
-            unknown_variables[name] = sp.Symbol(f"i_{name}", complex=True)
+            unknowns[name] = sp.Symbol(f"i_{name}", complex=True)
         for name in elem["nodes"]:
-            unknown_variables[name] = sp.Symbol(f"p_{name}", complex=True)
+            unknowns[name] = sp.Symbol(f"p_{name}", complex=True)
+            gnd_potential = unknowns[name]
     # Equation System
-    equations = dict((v, 0) for v in unknown_variables)
+    equations = dict((v, 0) for v in unknowns)
     for elem in elements:
-        AddElementToEquations(elem, equations, unknown_variables)
-    print("\n".join([str(e) for e in equations.items()]))
+        AddElementToEquations(elem, equations, unknowns)
+    equations["GND"] = gnd_potential
+    print(" = 0\n".join([f"{e[0]}: {e[1]}" for e in equations.items()]), end=" = 0\n")
+    # Solving for unknowns
+    equations_list = list(equations.values())
+    unknowns_list = list(unknowns.values())
+    sol = sp.solve(equations_list, unknowns_list)
+    print("unknowns:", unknowns.values())
+    print("solution:", sol)
 
 # M A I N
 
