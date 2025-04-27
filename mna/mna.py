@@ -14,11 +14,17 @@ def ParseVariable(var, local_vars):
     value = sp.Symbol(name)
     local_vars[name] = value
 
-#def ParseElement(elem, local_vars):
-#    parameters = el["parameters"]
-#    for param in parameters.items():
-#        key, value = param
-#        parameters[key] = parse_mathematica(value, locals=local_vars)
+def ParseElement(elem, local_vars):
+    parameters = elem["parameters"]
+    # TODO: Check if all variables are in local_vars
+    # TODO: Check if value is a string or a number
+    for param in parameters.items():
+        key, value = param
+        value = str(value)
+        parameters[key] = parse_mathematica(value)
+        replacement_dict = { sp.Symbol(k): v for k, v in local_vars.items() }
+        parameters[key] = parameters[key].subs(replacement_dict)
+    print(f"elem: {elem}")
 
 
 def Parse(fname):
@@ -35,10 +41,10 @@ def Parse(fname):
     print(variables)
     print(local_vars)
     # Parse elements
-    #elements = circuit["elements"]
-    #for elem in elements:
-    #    ParseElement(elem, local_vars)
-    #return circuit_data
+    elements = circuit["elements"]
+    for elem in elements:
+        ParseElement(elem, local_vars)
+    return circuit_data
 
 def Solve(circuit):
     pass
