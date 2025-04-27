@@ -1,13 +1,13 @@
 circuit:
   variables:
-    - { name: "u0", type: "real" }
+    - { name: "i0", type: "real" }
     - { name: "r1", type: "real" }
   elements:
-    - name: u0
-      type: voltage_source
-      nodes: [3, 1]
+    - name: i0
+      type: current_source
+      nodes: [2, 1]
       parameters:
-        voltage: "u0"
+        current: "i0"
     - name: r1
       type: resistor
       nodes: [1, 2]
@@ -15,6 +15,6 @@ circuit:
         resistance: "r1"
     - name: r2
       type: resistor
-      nodes: [2, 3]
+      nodes: [1, 2]
       parameters:
         resistance: "1"
