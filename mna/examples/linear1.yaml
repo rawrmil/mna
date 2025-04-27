@@ -1,0 +1,20 @@
+circuit:
+  variables:
+    - { name: "a", type: "real" }
+    - { name: "b", type: "real" }
+  elements:
+    - name: "u0"
+      type: voltage_source
+      nodes: [3, 1]
+      parameters:
+        voltage: 1
+    - name: "r1"
+      type: resistor
+      nodes: [1, 2]
+      parameters:
+        resistance: "a"
+    - name: "r2"
+      type: resistor
+      nodes: [2, 3]
+      parameters
+        resistance: "b"
