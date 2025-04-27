@@ -16,5 +16,5 @@ circuit:
     - name: "r2"
       type: resistor
       nodes: [2, 3]
-      parameters
+      parameters:
         resistance: "b"
