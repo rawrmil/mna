@@ -1,12 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "530ecd5bf8cd619508a640c4c2fb67b14258880d27737daf0dbabe7a87127153"
+            "sha256": "da3f5f4d5669d0f02430bfb009197dd7dea8c6e2a919f7691e40fd04832cc226"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_version": "3.12"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -85,12 +83,12 @@
         },
         "sympy": {
             "hashes": [
-                "sha256:54612cf55a62755ee71824ce692986f23c88ffa77207b30c1368eda4a7060f73",
-                "sha256:b27fd2c6530e0ab39e275fc9b683895367e51d5da91baa8d3d64db2565fec4d9"
+                "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517",
+                "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.8'",
-            "version": "==1.13.3"
+            "markers": "python_version >= '3.9'",
+            "version": "==1.14.0"
         }
     },
     "develop": {}
