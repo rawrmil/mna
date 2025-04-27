@@ -1,5 +1,5 @@
-# tbe
-My Theoretical Basics of Electrotechnics fun little solvers
+# TFEE
+My **T**heoretical **F**oundations of **E**lectrical **E**ngineering (TFEE) fun little solvers
 
 # MNA (Modified Nodal Analysis)
 - **INPUT**: some\_circuit.yaml
