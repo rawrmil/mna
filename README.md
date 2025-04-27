@@ -2,15 +2,20 @@
 My Theoretical Basics of Electrotechnics fun little solvers
 
 # MNA (Modified Nodal Analysis)
-## Running
+## Run using Pipenv
 ```bash
-# INPUT: somecirc.yams
+# INPUT: some-circuit-data.yaml
 # EXAMPLES: mna/example
 pip install pipenv
 cd mna
 pipenv run ./mna.py examples/linear1.yaml
 # OUTPUT: in command line
 # (in future) OUTPUT: solved.yaml
+```
+
+## Run using just Python
+```bash
+python3 mna/mna.py examples/linear1.yaml
 ```
 
 ## Writing custom circuits
