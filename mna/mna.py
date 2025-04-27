@@ -58,7 +58,7 @@ def AddElementToEquations(elem, equations, unknowns):
     if etype == "resistor":
         pot1, pot2 = unknowns[nodes[0]], unknowns[nodes[1]]
         equations[nodes[0]] += ((pot1-pot2)/parameters["resistance"])
-        equations[nodes[1]] -= ((pot2-pot1)/parameters["resistance"])
+        equations[nodes[1]] -= ((pot1-pot2)/parameters["resistance"])
     elif etype == "current_source":
         equations[nodes[0]] -= parameters["current"]
         equations[nodes[1]] += parameters["current"]
