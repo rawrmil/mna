@@ -17,7 +17,7 @@ pipenv run ./mna.py examples/linear1.yaml
 ```yaml
 circuit:
   variables:
-    # name: a-z/A-Z/0-8, type: real/complex
+    # name: a-z/A-Z/0-9, type: real/complex
     - { name: a, type: real }
     - { name: b, type: complex }
   elements:
