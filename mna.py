@@ -1,7 +1,9 @@
 #!/bin/python3
 
 import sys
-import json
+from pyhocon import ConfigFactory
+
+# TODO: Error handling when string parsing
 
 # 1-2 V2_1 {...}; ...
 def Parse(text):
@@ -13,7 +15,7 @@ def Parse(text):
     for i, c in enumerate(text):
         quotes_flag = (single_quotes_flag or double_quotes_flag)
         if quotes_flag and curly_depth == 0:
-            # TODO: Quotes out of dict
+            print("Quotes out of dict")
             exit(1)
         if not single_quotes_flag and c == '"':
             double_quotes_flag = not double_quotes_flag
@@ -23,19 +25,34 @@ def Parse(text):
             curly_depth += 1
         elif not quotes_flag and c == "}":
             curly_depth -= 1
-        elif curly_depth == 0 and c in [";", "\n"]:
+            if curly_depth < 0:
+                print(f"Unexpected '{'}'}' at {i}")
+                exit(1)
+        elif curly_depth == 0 and c == ";":
             sectors.append("")
             continue
         sectors[-1] += c
     # Creating circuit
     circuit = []
     for e in sectors:
-        tokens = e.strip().split(maxsplit=3)
+        tokens = e.strip().split(maxsplit=2)
         print(tokens)
+        if len(tokens) != 3:
+            print("Two whitespaces needed in each element")
+            exit(1)
+        nodes = tokens[0].split('-')
+        etype, name = tokens[1].split('_')
+        circuit.append({
+            "nodes": nodes,
+            "etype": etype,
+            "name": name,
+            "properties": dict(ConfigFactory.parse_string(tokens[2]))
+        })
+    return circuit
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        # TODO: Not enough arguments
+        print("Not enough arguments")
         exit(1)
     circuit = Parse(sys.argv[1])
     print(circuit)
