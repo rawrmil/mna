@@ -1,11 +1,13 @@
 #!/bin/python3
 
 import sys
+import sympy as sp
 from pyhocon import ConfigFactory
 
 # TODO: Error handling when string parsing
 
-# 1-2 V2_1 {...}; ...
+# P A R S E
+
 def Parse(text):
     # Skipping dicts and splitting by ';' or '\n'
     sectors = [""]
@@ -36,7 +38,6 @@ def Parse(text):
     circuit = []
     for e in sectors:
         tokens = e.strip().split(maxsplit=2)
-        print(tokens)
         if len(tokens) != 3:
             print("Two whitespaces needed in each element")
             exit(1)
@@ -44,15 +45,33 @@ def Parse(text):
         etype, name = tokens[1].split('_')
         circuit.append({
             "nodes": nodes,
-            "etype": etype,
+            "type": etype.lower(),
             "name": name,
             "properties": dict(ConfigFactory.parse_string(tokens[2]))
         })
     return circuit
+
+# P A R S E
+
+def Solve(circuit):
+    # Defining unknowns (node potentials & VS currents)
+    unknowns = dict()
+    gnd_potential = None
+    for elem in circuit:
+        print(elem["type"])
+        if elem["type"] == "vs":
+            name = elem["name"]
+            unknowns[name] = sp.Symbol(f"i_{name}", complex=True)
+        for name in elem["nodes"]:
+            unknowns[name] = sp.Symbol(f"p_{name}", complex=True)
+            gnd_potential = unknowns[name]
+    print("unknowns:", unknowns)
+
+# M A I N
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
         print("Not enough arguments")
         exit(1)
     circuit = Parse(sys.argv[1])
-    print(circuit)
+    Solve(circuit)
