@@ -3,6 +3,7 @@
 import sys
 import json
 
+# 1-2 V2_1 {...}; ...
 def Parse(text):
     # Skipping dicts and splitting by ';' or '\n'
     sectors = [""]
@@ -26,7 +27,11 @@ def Parse(text):
             sectors.append("")
             continue
         sectors[-1] += c
-    print(sectors)
+    # Creating circuit
+    circuit = []
+    for e in sectors:
+        tokens = e.strip().split(maxsplit=3)
+        print(tokens)
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
