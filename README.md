@@ -3,7 +3,7 @@
 ```bash
 pip install pipenv
 # or [packege] install python3-pipenv
-pipenv run python3 mna.py "1-2 VS_1 {u=10}; 2-1 R_2 {r="r2"}"
+pipenv run python3 mna.py "1-2 VS_1 {u=10}; 2-1 R_2 {r="Sqrt[2]"}"
 ```
 
 ## Mini-WIKI
@@ -12,7 +12,7 @@ Write each element in format:
 
 <node1> <node2> <type>_<name> {<properties>}
 
-separated by ; or nextline
+separated by ';'
 
 Element types:
 - VS - voltage source (requires "u")
