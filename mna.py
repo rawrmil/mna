@@ -52,11 +52,31 @@ def Parse(text):
     return circuit
 
 # P A R S E
+def ProcessElement(e, epot, ecur, upot, ucur):
+    name = e["name"]
+    etype = e["type"]
+    nodes = e["nodes"]
+    props = e["properties"]
+    if etype == "r":
+        pot1, pot2 = upot[nodes[0]], upot[nodes[1]]
+        r = props["r"]
+        epot[nodes[0]] += (pot1-pot2)/r
+        epot[nodes[1]] -= (pot1-pot2)/r
+    elif etype == "cs":
+        i = props["i"]
+        epot[nodes[0]] += i
+        epot[nodes[1]] -= i
+    elif etype == "vs":
+        u = props["u"]
+        pot1, pot2 = upot[nodes[0]], upot[nodes[1]]
+        epot[nodes[0]] += ucur[name]
+        epot[nodes[1]] -= ucur[name]
+        ecur[name] += pot2-pot1-u
 
 def Solve(circuit):
     # Defining unknowns (potentials & currents)
-    ucur = dict()
     upot = dict()
+    ucur = dict()
     gnd = None
     for e in circuit:
         print(e["type"])
@@ -66,8 +86,20 @@ def Solve(circuit):
         for name in e["nodes"]:
             upot[name] = sp.Symbol(f"p_{name}", complex=True)
             gnd = upot[name]
-    print("unknown currents:", ucur)
-    print("unknown potentials:", upot)
+    print("unk pot:", upot)
+    print("unk cur:", ucur)
+    # Equations
+    epot = dict((u, 0) for u in upot)
+    ecur = dict((u, 0) for u in ucur)
+    for e in circuit:
+        ProcessElement(e, epot, ecur, upot, ucur)
+    print("eq pot: ", epot)
+    print("eq cur: ", ecur)
+    # Solving
+    elist = list(epot.values())+list(ecur.values())+[gnd]
+    ulist = list(upot.values())+list(ucur.values())
+    sol = sp.solve(elist, ulist)
+    print("solution:", sol)
 
 # M A I N
 
