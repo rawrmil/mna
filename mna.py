@@ -2,6 +2,7 @@
 
 import sys
 import sympy as sp
+from sympy.parsing.mathematica import parse_mathematica
 from pyhocon import ConfigFactory
 
 # TODO: Error handling when string parsing
@@ -49,10 +50,13 @@ def Parse(text):
             "name": name,
             "properties": dict(ConfigFactory.parse_string(tokens[2]))
         })
+        props = circuit[-1]["properties"]
+        for k, v in props.items():
+             props[k] = parse_mathematica(str(v))
     return circuit
 
 # P A R S E
-def ProcessElement(e, epot, ecur, upot, ucur):
+def AddElementToEquation(e, epot, ecur, upot, ucur):
     name = e["name"]
     etype = e["type"]
     nodes = e["nodes"]
@@ -73,33 +77,45 @@ def ProcessElement(e, epot, ecur, upot, ucur):
         epot[nodes[1]] -= ucur[name]
         ecur[name] += pot2-pot1-u
 
+def SolveForVoltageAndCurrent(e, upot, ucur, sol):
+    name = e["name"]
+    etype = e["type"]
+    nodes = e["nodes"]
+    props = e["properties"]
+    pot1, pot2 = upot[nodes[0]], upot[nodes[1]]
+    if etype == "r":
+        props["u"] = (pot1-pot2).subs(sol)
+        props["i"] = (props["u"]/props["r"]).subs(sol)
+    elif etype == "cs":
+        props["u"] = (pot2-pot1).subs(sol)
+    elif etype == "vs":
+        props["i"] = (ucur[name]).subs(sol)
+    
+
 def Solve(circuit):
     # Defining unknowns (potentials & currents)
     upot = dict()
     ucur = dict()
-    gnd = None
     for e in circuit:
-        print(e["type"])
         if e["type"] == "vs":
             name = e["name"]
             ucur[name] = sp.Symbol(f"i_{name}", complex=True)
         for name in e["nodes"]:
             upot[name] = sp.Symbol(f"p_{name}", complex=True)
-            gnd = upot[name]
-    print("unk pot:", upot)
-    print("unk cur:", ucur)
+    gnd = list(upot.values())[-1]
     # Equations
     epot = dict((u, 0) for u in upot)
     ecur = dict((u, 0) for u in ucur)
     for e in circuit:
-        ProcessElement(e, epot, ecur, upot, ucur)
-    print("eq pot: ", epot)
-    print("eq cur: ", ecur)
+        AddElementToEquation(e, epot, ecur, upot, ucur)
     # Solving
     elist = list(epot.values())+list(ecur.values())+[gnd]
     ulist = list(upot.values())+list(ucur.values())
     sol = sp.solve(elist, ulist)
-    print("solution:", sol)
+    # Finding voltages & currents
+    for e in circuit:
+        SolveForVoltageAndCurrent(e, upot, ucur, sol)
+    return circuit
 
 # M A I N
 
@@ -109,3 +125,8 @@ if __name__ == "__main__":
         exit(1)
     circuit = Parse(sys.argv[1])
     Solve(circuit)
+    for e in circuit:
+        name = e["name"]
+        props = e["properties"]
+        print(f"u_{name} = {props['u']}")
+        print(f"i_{name} = {props['i']}")
