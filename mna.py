@@ -54,18 +54,20 @@ def Parse(text):
 # P A R S E
 
 def Solve(circuit):
-    # Defining unknowns (node potentials & VS currents)
-    unknowns = dict()
-    gnd_potential = None
-    for elem in circuit:
-        print(elem["type"])
-        if elem["type"] == "vs":
-            name = elem["name"]
-            unknowns[name] = sp.Symbol(f"i_{name}", complex=True)
-        for name in elem["nodes"]:
-            unknowns[name] = sp.Symbol(f"p_{name}", complex=True)
-            gnd_potential = unknowns[name]
-    print("unknowns:", unknowns)
+    # Defining unknowns (potentials & currents)
+    ucur = dict()
+    upot = dict()
+    gnd = None
+    for e in circuit:
+        print(e["type"])
+        if e["type"] == "vs":
+            name = e["name"]
+            ucur[name] = sp.Symbol(f"i_{name}", complex=True)
+        for name in e["nodes"]:
+            upot[name] = sp.Symbol(f"p_{name}", complex=True)
+            gnd = upot[name]
+    print("unknown currents:", ucur)
+    print("unknown potentials:", upot)
 
 # M A I N
 
