@@ -128,5 +128,5 @@ if __name__ == "__main__":
     for e in circuit:
         name = e["name"]
         props = e["properties"]
-        print(f"u_{name} = {props['u']}")
-        print(f"i_{name} = {props['i']}")
+        print(f"u_{name} = {sp.simplify(props['u'])}")
+        print(f"i_{name} = {sp.simplify(props['i'])}")
