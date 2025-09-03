@@ -3,9 +3,7 @@
 import sys
 import sympy as sp
 from sympy.parsing.mathematica import parse_mathematica
-from pyhocon import ConfigFactory
-
-# TODO: Error handling when string parsing
+import json
 
 # P A R S E
 
@@ -48,14 +46,13 @@ def Parse(text):
             "nodes": nodes,
             "type": etype.lower(),
             "name": name,
-            "properties": dict(ConfigFactory.parse_string(tokens[2]))
+            "properties": json.loads(tokens[2])
         })
         props = circuit[-1]["properties"]
         for k, v in props.items():
              props[k] = parse_mathematica(str(v))
     return circuit
 
-# P A R S E
 def AddElementToEquation(e, epot, ecur, upot, ucur):
     name = e["name"]
     etype = e["type"]
@@ -76,6 +73,8 @@ def AddElementToEquation(e, epot, ecur, upot, ucur):
         epot[nodes[0]] += ucur[name]
         epot[nodes[1]] -= ucur[name]
         ecur[name] += pot2-pot1-u
+
+# S O L V E
 
 def SolveForVoltageAndCurrent(e, upot, ucur, sol):
     name = e["name"]
